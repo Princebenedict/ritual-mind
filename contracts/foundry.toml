@@ -1,0 +1,35 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+script = "script"
+solc = "0.8.20"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+bytecode_hash = "none"
+gas_reports = ["ScoreOracle", "WalletRegistry", "ProjectRegistry", "BadgeNFT", "ActivityEmitter"]
+
+[profile.ci]
+via_ir = true
+fuzz = {runs = 512}
+
+# These lints are reviewed and intentionally allowed. Every truncating cast in this
+# codebase is bounded (uint64 timestamps, uint32 registration counts, uint16 scores
+# capped at 1000). Timestamp comparisons gate day scale windows where second level
+# validator drift is immaterial.
+[lint]
+exclude_lints = ["unsafe-typecast", "block-timestamp"]
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = false
+int_types = "long"
+
+[rpc_endpoints]
+ritual = "${RITUAL_RPC_URL}"
+
+[etherscan]
+ritual = {key = "unused", url = "${RITUAL_VERIFIER_URL}"}
