@@ -17,6 +17,19 @@ export interface ScoreSnapshot {
   advocate: number;
   community: number;
   user: number;
+  /** TEE attestation hash written with this snapshot. Verifiable evidence. */
+  attestationHash: string;
+}
+
+/** Verifiable provenance for an on chain value: the contract it was read from, the
+ *  transaction that wrote it, the block, the time, and a clickable explorer link. */
+export interface Evidence {
+  contract: Address;
+  explorer: string;
+  txHash?: string;
+  blockNumber?: number;
+  timestamp?: number;
+  attestationHash?: string;
 }
 
 export interface WalletProfile {

@@ -2,9 +2,26 @@
 
 import Link from "next/link";
 import {AnimatePresence, motion} from "framer-motion";
-import {ArrowLeftRight, Boxes, CheckCircle2, Clock, FileCode2, Radio, type LucideIcon} from "lucide-react";
+import {
+  ArrowLeftRight,
+  Award,
+  Boxes,
+  CheckCircle2,
+  Clock,
+  Cpu,
+  FileCode2,
+  FileText,
+  Handshake,
+  Megaphone,
+  PackagePlus,
+  Radio,
+  ShieldAlert,
+  Sparkles,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
 import {formatEther} from "viem";
-import {useLiveActivity} from "@/lib/hooks";
+import {useLiveActivity, type LiveItem} from "@/lib/hooks";
 import {explorerBlock, explorerTx} from "@/lib/chain";
 import {shortHash, type ChainTx, type TxKind} from "@/lib/rpc";
 import {shortAddress, timeAgo, cn} from "@/lib/utils";
@@ -20,7 +37,20 @@ const KIND: Record<TxKind, {icon: LucideIcon; accent: string}> = {
   call: {icon: Boxes, accent: "text-agent"},
 };
 
-function Row({tx}: {tx: ChainTx}) {
+/** Icon and accent for each decoded ActivityEmitter event. */
+const EVENT_META: Record<string, {icon: LucideIcon; accent: string}> = {
+  ScoreUpdated: {icon: TrendingUp, accent: "text-brand"},
+  ContractDeployed: {icon: FileCode2, accent: "text-info"},
+  ProjectRegistered: {icon: PackagePlus, accent: "text-agent"},
+  AttestationGiven: {icon: Handshake, accent: "text-good"},
+  BadgeEarned: {icon: Award, accent: "text-gold"},
+  AgentExecution: {icon: Cpu, accent: "text-agent"},
+  SocialMilestone: {icon: Megaphone, accent: "text-data"},
+  DigestPosted: {icon: FileText, accent: "text-brand"},
+  WalletFlagged: {icon: ShieldAlert, accent: "text-bad"},
+};
+
+function TxRow({tx}: {tx: ChainTx}) {
   const {icon: Icon, accent} = KIND[tx.kind];
   return (
     <div className="flex items-start gap-3 px-4 py-3">
@@ -38,17 +68,10 @@ function Row({tx}: {tx: ChainTx}) {
             {tx.label}
             {tx.precompile !== null ? <span className="text-ink-dim"> · {tx.precompile}</span> : null}
           </span>
-          <span className="shrink-0 font-mono text-[11px] text-ink-dim">
-            {timeAgo(Math.floor(tx.timestampMs / 1000))}
-          </span>
+          <span className="shrink-0 font-mono text-[11px] text-ink-dim">{timeAgo(Math.floor(tx.timestampMs / 1000))}</span>
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-          <a
-            href={explorerTx(tx.hash)}
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono text-ink-dim hover:text-brand"
-          >
+          <a href={explorerTx(tx.hash)} target="_blank" rel="noreferrer" className="font-mono text-ink-dim hover:text-brand">
             {shortHash(tx.hash)}
           </a>
           {tx.to !== null ? (
@@ -67,6 +90,52 @@ function Row({tx}: {tx: ChainTx}) {
             className="font-mono text-ink-dim hover:text-brand"
           >
             block {tx.blockNumber.toLocaleString("en-US")}
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EventRow({item}: {item: Extract<LiveItem, {type: "event"}>}) {
+  const {event, timestampMs} = item;
+  const meta = EVENT_META[event.kind] ?? {icon: Sparkles, accent: "text-brand"};
+  const Icon = meta.icon;
+  return (
+    <div className="flex items-start gap-3 bg-brand/[0.03] px-4 py-3">
+      <div
+        className={cn(
+          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand/20 bg-brand/[0.06]",
+          meta.accent,
+        )}
+      >
+        <Icon size={15} strokeWidth={1.75} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-sm text-ink">
+            {event.label}
+            <span className="text-ink-dim"> · {event.detail}</span>
+          </span>
+          <span className="shrink-0 font-mono text-[11px] text-ink-dim">{timeAgo(Math.floor(timestampMs / 1000))}</span>
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+          <span className="text-[10px] font-bold uppercase tracking-wide text-brand">Ritual Mind</span>
+          <a href={explorerTx(event.txHash)} target="_blank" rel="noreferrer" className="font-mono text-ink-dim hover:text-brand">
+            {shortHash(event.txHash)}
+          </a>
+          {event.wallet !== null ? (
+            <Link href={`/wallet/${event.wallet}`} className="font-mono text-ink-dim hover:text-brand">
+              {shortAddress(event.wallet)}
+            </Link>
+          ) : null}
+          <a
+            href={explorerBlock(event.blockNumber)}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-ink-dim hover:text-brand"
+          >
+            block {event.blockNumber.toLocaleString("en-US")}
           </a>
         </div>
       </div>
@@ -105,8 +174,8 @@ export function LiveFeed({limit = 14}: {limit?: number}) {
       {status === "error" && shown.length === 0 ? (
         <div className="p-4">
           <Unavailable title="Live activity is unavailable">
-            The Ritual RPC could not be reached. This feed shows only real transactions and resumes when the network
-            responds.
+            The Ritual RPC could not be reached. This feed shows only real transactions and events and resumes when the
+            network responds.
           </Unavailable>
         </div>
       ) : shown.length === 0 && status === "connecting" ? (
@@ -130,15 +199,15 @@ export function LiveFeed({limit = 14}: {limit?: number}) {
       ) : (
         <div className="divide-y divide-black/[0.05]">
           <AnimatePresence initial={false}>
-            {shown.map((tx) => (
+            {shown.map((item) => (
               <motion.div
-                key={tx.hash}
+                key={item.key}
                 layout
                 initial={{opacity: 0, y: -12}}
                 animate={{opacity: 1, y: 0}}
                 transition={{type: "spring", stiffness: 320, damping: 30}}
               >
-                <Row tx={tx} />
+                {item.type === "event" ? <EventRow item={item} /> : <TxRow tx={item.tx} />}
               </motion.div>
             ))}
           </AnimatePresence>

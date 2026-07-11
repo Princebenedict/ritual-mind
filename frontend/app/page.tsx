@@ -57,8 +57,8 @@ export default function LandingPage() {
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-muted">
               Ritual Mind reads data directly from Ritual Network. Paste any address to see its real on chain activity.
-              Reputation scoring, computed in a trusted execution environment and attested on chain, goes live once the
-              Ritual Mind contracts are deployed.
+              Reputation is computed in a trusted execution environment and attested on chain, read straight from the
+              deployed Ritual Mind contracts.
             </p>
             <div className="mt-7 max-w-xl">
               <WalletSearch />
@@ -117,12 +117,13 @@ export default function LandingPage() {
           <div className="rounded-3xl border border-black/[0.06] bg-white p-8 shadow-soft sm:p-10">
             <SectionLabel>Reputation</SectionLabel>
             <h2 className="mt-2 max-w-2xl text-2xl font-bold sm:text-3xl">
-              Reputation scoring goes live once the Ritual Mind contracts are deployed.
+              Reputation is computed in the enclave and attested on chain.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">
-              The WalletRegistry, ScoreOracle, and agent are not yet on chain, so there are no scores to show. Nothing
-              here is estimated or invented. When the contracts are deployed and their addresses are configured, real
-              scores flow in with no further change. The model that will be computed is below.
+              The WalletRegistry, ScoreOracle, BadgeNFT, and ProjectRegistry are deployed on Ritual Chain. The registries
+              are empty until the agent completes its first six hour cycle, so no scores are shown yet, and nothing here
+              is estimated or invented. Real scores flow in straight from the contracts, with their on chain evidence.
+              The model is below.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {MODEL.map((component) => (
@@ -166,8 +167,8 @@ export default function LandingPage() {
           <div className="relative max-w-2xl">
             <h2 className="text-2xl font-bold sm:text-3xl">Bring reputation into your app.</h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-              Read scores, badges, and verified builder status with a typed SDK once the contracts are live. Every value
-              is backed by an on chain attestation, so your users can verify it themselves.
+              Read scores, badges, and verified builder status with a typed SDK, straight from the deployed contracts.
+              Every value is backed by an on chain attestation, so your users can verify it themselves.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/sdk" className={buttonClass("brand")}>

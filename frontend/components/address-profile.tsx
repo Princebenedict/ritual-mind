@@ -1,11 +1,16 @@
 "use client";
 
 import {ArrowUpRight, Boxes, FileCode2, User, Wallet} from "lucide-react";
-import {useAddressOverview, useWalletReputation, isReputationConfigured} from "@/lib/hooks";
+import {useAddressOverview, useScoreEvidence, useWalletProfile, contractsConfigured} from "@/lib/hooks";
+import {contractEvidence} from "@/lib/contracts";
 import {MonoAddress} from "@/components/ui/mono";
 import {Card, SectionLabel, Skeleton, Tag} from "@/components/ui/primitives";
 import {Unavailable} from "@/components/unavailable";
-import {explorerAddress} from "@/lib/chain";
+import {BadgeGrid} from "@/components/badges";
+import {ScoreBreakdown} from "@/components/score-breakdown";
+import {EvidenceBar} from "@/components/evidence";
+import {CONTRACTS, explorerAddress} from "@/lib/chain";
+import type {Address} from "@/lib/types";
 
 function Metric({label, value, sub}: {label: string; value: string; sub?: string}) {
   return (
@@ -18,36 +23,90 @@ function Metric({label, value, sub}: {label: string; value: string; sub?: string
 }
 
 function ReputationSection({address}: {address: string}) {
-  const configured = isReputationConfigured();
-  const {data, isLoading} = useWalletReputation(address);
+  const configured = contractsConfigured();
+  const {data, isLoading, isError} = useWalletProfile(address);
+  const registered = data !== null && data !== undefined;
+  const {data: evidence} = useScoreEvidence(address, registered);
 
   if (!configured) {
     return (
-      <Unavailable title="Reputation scoring is not live yet">
-        The Ritual Mind contracts are not deployed, so this address has no on chain reputation to show. Nothing here is
-        estimated. Once the contracts are deployed and configured, a verifiable composite score and its evidence appear
-        here automatically.
+      <Unavailable title="Reputation scoring is not configured">
+        The Ritual Mind contract addresses are not set for this deployment, so no reputation can be read. Nothing here is
+        estimated.
       </Unavailable>
     );
   }
-  if (isLoading || data === undefined || data === null) {
+  if (isLoading) {
     return <Skeleton className="h-40 w-full" />;
   }
+  if (isError) {
+    return (
+      <Unavailable title="Reputation could not be read">
+        The WalletRegistry did not respond for this address. This is likely transient. A score is never guessed, so
+        nothing is shown until the read succeeds.
+      </Unavailable>
+    );
+  }
+  if (!registered) {
+    return (
+      <Unavailable title="Not registered with Ritual Mind">
+        This address has not registered with the WalletRegistry, so it has no reputation score yet. The registry is live
+        on chain, and this view fills in automatically once the wallet registers and the agent scores it. Nothing is
+        estimated.
+      </Unavailable>
+    );
+  }
+
+  const scoreEvidence = evidence ?? contractEvidence(CONTRACTS.walletRegistry as Address);
+  const hasBadges = data.badges.length > 0;
+
   return (
-    <Card>
-      <div className="flex items-center justify-between">
-        <SectionLabel>Reputation</SectionLabel>
-        <a href={data.evidence.explorer} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-mono text-[11px] text-good hover:underline">
-          verified on chain <ArrowUpRight size={12} />
-        </a>
+    <div className="space-y-6">
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionLabel>Reputation, from the WalletRegistry</SectionLabel>
+          <div className="flex items-center gap-2">
+            {data.flagSeverity >= 2 ? (
+              <Tag tone="bad">flagged</Tag>
+            ) : data.isVerifiedBuilder ? (
+              <Tag tone="good">verified builder</Tag>
+            ) : null}
+            {data.globalRank > 0 ? <Tag tone="brand">rank #{data.globalRank}</Tag> : null}
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <Metric label="Composite" value={String(data.composite)} sub="out of 1000" />
+          <Metric label="Builder" value={String(data.builder)} sub="out of 400" />
+          <Metric label="Advocate" value={String(data.advocate)} sub="out of 300" />
+          <Metric label="Community" value={String(data.community)} sub="out of 200" />
+          <Metric label="User" value={String(data.user)} sub="out of 100" />
+        </div>
+        <div className="mt-4">
+          <EvidenceBar evidence={scoreEvidence} label="Score written on chain" />
+        </div>
+      </Card>
+
+      <div>
+        <div className="mb-3">
+          <SectionLabel>Component breakdown</SectionLabel>
+        </div>
+        <ScoreBreakdown profile={data} />
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Metric label="Composite" value={String(data.composite)} sub="out of 1000" />
-        <Metric label="Builder" value={String(data.builder)} sub="out of 400" />
-        <Metric label="Advocate" value={String(data.advocate)} sub="out of 300" />
-        <Metric label="Community" value={String(data.community)} sub="out of 200" />
+
+      <div>
+        <div className="mb-3">
+          <SectionLabel>Soulbound badges{hasBadges ? ` (${data.badges.length})` : ""}</SectionLabel>
+        </div>
+        {hasBadges ? (
+          <BadgeGrid earned={data.badges} earnedAt={data.badgeEarnedAt} />
+        ) : (
+          <p className="text-sm text-ink-muted">
+            No badges earned yet. Badges are soulbound and minted by the ScoreOracle when this wallet crosses a
+            threshold. Each is verifiable on chain.
+          </p>
+        )}
       </div>
-    </Card>
+    </div>
   );
 }
 

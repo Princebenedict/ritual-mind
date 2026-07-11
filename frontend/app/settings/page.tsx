@@ -28,8 +28,9 @@ export default function SettingsPage() {
           <SectionLabel>Data sources</SectionLabel>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             All data is read live from the official Ritual RPC at rpc.ritualfoundation.org and can be verified on the
-            explorer at {EXPLORER_URL.replace("https://", "")}. Reputation features that depend on the Ritual Mind
-            contracts and scoring agent are shown as unavailable until those are deployed on chain.
+            explorer at {EXPLORER_URL.replace("https://", "")}. The Ritual Mind contracts are deployed on Ritual Chain,
+            so reputation features read straight from the WalletRegistry, ScoreOracle, BadgeNFT, and ProjectRegistry, and
+            fill in as wallets register and the agent scores them.
           </p>
         </Card>
       </div>

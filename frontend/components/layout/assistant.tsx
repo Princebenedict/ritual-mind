@@ -24,12 +24,12 @@ function answer(query: string, status: NetworkStatus | undefined): string {
     return "Paste a Ritual address in the search to read its real balance, outgoing transaction count, and account type. No wallet connection is required.";
   }
   if (q.includes("reputation") || q.includes("score") || q.includes("badge") || q.includes("rank")) {
-    return "Reputation scoring is not live yet. The Ritual Mind contracts are not deployed, so there are no scores, badges, or rankings, and nothing is estimated. Once the contracts are deployed and configured, real scores appear with on chain evidence such as the registry address and explorer links.";
+    return "Reputation is live on chain. The Ritual Mind contracts are deployed on Ritual Chain, but the registries are empty until the agent completes its first cycle, so there are no scores, badges, or rankings yet, and nothing is estimated. Real scores appear with on chain evidence such as the registry address, the transaction that wrote them, and explorer links.";
   }
   if (q.includes("feed") || q.includes("activity") || q.includes("transaction")) {
     return "The live activity feed shows real transactions from the latest Ritual blocks, decoded into their native types such as async commitments and settlements. Each item links to the official explorer.";
   }
-  return "I report live network status from the Ritual RPC and explain what data is available. Chain data such as blocks, transactions, and address balances is live now. Reputation features go live once the Ritual Mind contracts are deployed.";
+  return "I report live network status from the Ritual RPC and explain what data is available. Chain data such as blocks, transactions, and address balances is live now. Reputation features read from the deployed Ritual Mind contracts and fill in as wallets register and the agent scores them.";
 }
 
 export function Assistant() {
@@ -40,7 +40,7 @@ export function Assistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      text: "I can report live Ritual Network status and explain what data is available. Chain data is live. Reputation features go live once the contracts are deployed.",
+      text: "I can report live Ritual Network status and explain what data is available. Chain data is live, and the Ritual Mind contracts are deployed, so reputation fills in as wallets register and the agent scores them.",
     },
   ]);
 

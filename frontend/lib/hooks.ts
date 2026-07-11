@@ -11,7 +11,22 @@ import {
   isValidAddress,
   type ChainTx,
 } from "./rpc";
-import {getWalletReputation, isReputationConfigured} from "./reputation";
+import {RPC_WS_URL} from "./chain";
+import {
+  contractsConfigured,
+  getActivityEmitterEvents,
+  getLatestScoreEvidence,
+  getProject,
+  getRecentRitualMindEvents,
+  getScoreHistory,
+  getTopProfiles,
+  getTotalProjects,
+  getTotalRegistered,
+  getTrendingProjects,
+  getWalletProfile,
+  type RmEvent,
+} from "./contracts";
+import type {Address} from "./types";
 
 /**
  * Data hooks. Every hook reads real Ritual Network data. There is no demo or seeded data.
@@ -19,7 +34,7 @@ import {getWalletReputation, isReputationConfigured} from "./reputation";
  * honest unavailable message instead of a fabricated value.
  */
 
-const WS_URL = process.env.NEXT_PUBLIC_RITUAL_WS_URL ?? "wss://rpc.ritualfoundation.org/ws";
+const WS_URL = RPC_WS_URL;
 
 export function useNetworkStatus() {
   return useQuery({queryKey: ["network-status"], queryFn: getNetworkStatus, refetchInterval: 5000, staleTime: 3000});
@@ -35,18 +50,108 @@ export function useAddressOverview(address: string) {
   });
 }
 
-/** Real on chain reputation. Enabled only when the WalletRegistry is deployed and its
- *  address is configured. Until then it never fires and the UI shows the pending state. */
-export function useWalletReputation(address: string) {
+/** Whether the deployed Ritual Mind contracts are configured. */
+export {contractsConfigured};
+/** Back compat alias used by components that gate the reputation UI. */
+export function isReputationConfigured(): boolean {
+  return contractsConfigured();
+}
+
+/**
+ * Real on chain reputation profile for a wallet, read from the deployed WalletRegistry and
+ * BadgeNFT via viem. Resolves to null when the wallet has never registered, so the UI can
+ * show an honest "not registered" state instead of a fabricated zero score. Enabled only
+ * when the contract addresses are configured.
+ */
+export function useWalletProfile(address: string) {
   return useQuery({
-    queryKey: ["reputation", address.toLowerCase()],
-    queryFn: () => getWalletReputation(address),
-    enabled: isReputationConfigured() && isValidAddress(address),
+    queryKey: ["wallet-profile", address.toLowerCase()],
+    queryFn: () => getWalletProfile(address as Address),
+    enabled: contractsConfigured() && isValidAddress(address),
     staleTime: 30000,
   });
 }
 
-export {isReputationConfigured};
+/** Immutable score history for a wallet. Fetched only once a profile exists. */
+export function useScoreHistory(address: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["score-history", address.toLowerCase()],
+    queryFn: () => getScoreHistory(address as Address),
+    enabled: enabled && contractsConfigured() && isValidAddress(address),
+    staleTime: 30000,
+  });
+}
+
+/** The transaction that last wrote this wallet's score, cited as verifiable evidence. */
+export function useScoreEvidence(address: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["score-evidence", address.toLowerCase()],
+    queryFn: () => getLatestScoreEvidence(address as Address),
+    enabled: enabled && contractsConfigured() && isValidAddress(address),
+    staleTime: 60000,
+  });
+}
+
+/** Total wallets ever registered. Drives the leaderboard and analytics empty states. */
+export function useTotalRegistered() {
+  return useQuery({
+    queryKey: ["total-registered"],
+    queryFn: getTotalRegistered,
+    enabled: contractsConfigured(),
+    staleTime: 20000,
+  });
+}
+
+/** The leaderboard: top wallets by composite, already ranked by the WalletRegistry. */
+export function useLeaderboard(count = 50) {
+  return useQuery({
+    queryKey: ["leaderboard", count],
+    queryFn: () => getTopProfiles(count),
+    enabled: contractsConfigured(),
+    staleTime: 30000,
+  });
+}
+
+/** Total registered projects. Drives the projects empty state. */
+export function useTotalProjects() {
+  return useQuery({
+    queryKey: ["total-projects"],
+    queryFn: getTotalProjects,
+    enabled: contractsConfigured(),
+    staleTime: 20000,
+  });
+}
+
+/** Trending projects from the ProjectRegistry, already ranked by the contract. */
+export function useProjects(count = 50) {
+  return useQuery({
+    queryKey: ["projects", count],
+    queryFn: () => getTrendingProjects(count),
+    enabled: contractsConfigured(),
+    staleTime: 30000,
+  });
+}
+
+/** A single registered project by contract address, or null when not registered. */
+export function useProject(address: string) {
+  return useQuery({
+    queryKey: ["project", address.toLowerCase()],
+    queryFn: () => getProject(address as Address),
+    enabled: contractsConfigured() && isValidAddress(address),
+    staleTime: 30000,
+  });
+}
+
+/** Recent decoded Ritual Mind events from the ActivityEmitter, newest first. Backs the intel
+ *  (DigestPosted) and social (SocialMilestone) pages. Empty until the agent emits events. */
+export function useRitualMindEvents() {
+  return useQuery({
+    queryKey: ["ritual-mind-events"],
+    queryFn: () => getRecentRitualMindEvents(),
+    enabled: contractsConfigured(),
+    staleTime: 30000,
+  });
+}
 
 export type LiveStatus = "connecting" | "live" | "polling" | "error";
 
@@ -55,13 +160,51 @@ interface NewHeadsMessage {
 }
 
 /**
- * Live activity from genuine Ritual Network events. A WebSocket subscribes to new block
- * heads. On each new head the corresponding blocks are fetched and only transactions with
- * a hash not seen before are prepended, so items animate in only for real events. If the
- * WebSocket cannot connect, the same processing loop polls the RPC for the head instead.
+ * One item in the live feed. Either a real transaction from a Ritual block, or a decoded
+ * Ritual Mind event emitted by the ActivityEmitter contract. Both carry the block and time
+ * so they interleave in one chronological stream, and both link to the explorer.
  */
-export function useLiveActivity(max = 40): {items: ChainTx[]; status: LiveStatus} {
-  const [items, setItems] = useState<ChainTx[]>([]);
+export type LiveItem =
+  | {type: "tx"; key: string; blockNumber: number; timestampMs: number; tx: ChainTx}
+  | {type: "event"; key: string; blockNumber: number; timestampMs: number; logIndex: number; event: RmEvent};
+
+const toTxItem = (tx: ChainTx): LiveItem => ({
+  type: "tx",
+  key: tx.hash,
+  blockNumber: tx.blockNumber,
+  timestampMs: tx.timestampMs,
+  tx,
+});
+
+const toEventItem = (event: RmEvent, timestampMs: number): LiveItem => ({
+  type: "event",
+  key: event.id,
+  blockNumber: event.blockNumber,
+  timestampMs,
+  logIndex: event.logIndex,
+  event,
+});
+
+/** Newest block first. Within a block, decoded Ritual Mind events come before raw txs, then
+ *  by log order, so the stream reads cleanly. */
+function compareItems(a: LiveItem, b: LiveItem): number {
+  if (a.blockNumber !== b.blockNumber) return b.blockNumber - a.blockNumber;
+  if (a.type !== b.type) return a.type === "event" ? -1 : 1;
+  if (a.type === "event" && b.type === "event") return a.logIndex - b.logIndex;
+  return 0;
+}
+
+/**
+ * Live activity from genuine Ritual Network events. A WebSocket subscribes to new block
+ * heads. On each new head the corresponding blocks are fetched for transactions, and the
+ * ActivityEmitter logs for the same block range are fetched and decoded, so real Ritual Mind
+ * events (score updates, badges, digests, deployments) appear alongside raw transactions.
+ * Only items with a key not seen before are prepended, so the feed animates in solely for
+ * genuine new events, never simulated ones. If the WebSocket cannot connect, the same loop
+ * polls the RPC for the head instead.
+ */
+export function useLiveActivity(max = 40): {items: LiveItem[]; status: LiveStatus} {
+  const [items, setItems] = useState<LiveItem[]>([]);
   const [status, setStatus] = useState<LiveStatus>("connecting");
   const seen = useRef<Set<string>>(new Set());
   const lastBlock = useRef<number>(0);
@@ -73,22 +216,31 @@ export function useLiveActivity(max = 40): {items: ChainTx[]; status: LiveStatus
     let interval: ReturnType<typeof setInterval> | null = null;
     let reconnect: ReturnType<typeof setTimeout> | null = null;
 
-    const mergeNew = (incoming: ChainTx[]): void => {
-      const fresh = incoming.filter((tx) => !seen.current.has(tx.hash));
+    const mergeItems = (incoming: LiveItem[]): void => {
+      const fresh = incoming.filter((item) => !seen.current.has(item.key));
       if (fresh.length === 0) return;
-      for (const tx of fresh) seen.current.add(tx.hash);
+      for (const item of fresh) seen.current.add(item.key);
       if (seen.current.size > 4000) seen.current = new Set([...seen.current].slice(-2000));
-      setItems((prev) => [...fresh, ...prev].slice(0, max));
+      setItems((prev) => [...fresh, ...prev].sort(compareItems).slice(0, max));
+    };
+
+    const buildItems = (txs: ChainTx[], events: RmEvent[]): LiveItem[] => {
+      const tsByBlock = new Map(txs.map((tx) => [tx.blockNumber, tx.timestampMs]));
+      const fallbackTs = txs.length > 0 ? Math.max(...txs.map((tx) => tx.timestampMs)) : Date.now();
+      return [...txs.map(toTxItem), ...events.map((event) => toEventItem(event, tsByBlock.get(event.blockNumber) ?? fallbackTs))];
     };
 
     const seed = async (): Promise<void> => {
       const recent = await getRecentActivity(20);
       if (cancelled) return;
-      for (const tx of recent) seen.current.add(tx.hash);
-      setItems(recent.slice(0, max));
-      lastBlock.current =
-        recent.length > 0 ? Math.max(...recent.map((tx) => tx.blockNumber)) : await getLatestBlockNumber();
-      head.current = lastBlock.current;
+      const head0 = recent.length > 0 ? Math.max(...recent.map((tx) => tx.blockNumber)) : await getLatestBlockNumber();
+      const events = contractsConfigured() ? await getActivityEmitterEvents(Math.max(0, head0 - 19), head0) : [];
+      if (cancelled) return;
+      const built = buildItems(recent, events).sort(compareItems);
+      for (const item of built) seen.current.add(item.key);
+      setItems(built.slice(0, max));
+      lastBlock.current = head0;
+      head.current = head0;
     };
 
     const process = async (): Promise<void> => {
@@ -101,9 +253,12 @@ export function useLiveActivity(max = 40): {items: ChainTx[]; status: LiveStatus
           const from = Math.max(lastBlock.current + 1, target - 29);
           const numbers: number[] = [];
           for (let n = from; n <= target; n += 1) numbers.push(n);
-          const txs = await getActivityForBlocks(numbers);
+          const [txs, events] = await Promise.all([
+            getActivityForBlocks(numbers),
+            contractsConfigured() ? getActivityEmitterEvents(from, target) : Promise.resolve([] as RmEvent[]),
+          ]);
           if (cancelled) return;
-          mergeNew(txs);
+          mergeItems(buildItems(txs, events));
           lastBlock.current = target;
         }
       } catch {

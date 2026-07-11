@@ -7,7 +7,10 @@ import {NextResponse} from "next/server";
  * cached. The response is passed through unchanged.
  */
 const RPC_URL =
-  process.env.RITUAL_RPC_URL ?? process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? "https://rpc.ritualfoundation.org";
+  process.env.RITUAL_RPC_URL ??
+  process.env.NEXT_PUBLIC_RPC_URL ??
+  process.env.NEXT_PUBLIC_RITUAL_RPC_URL ??
+  "https://rpc.ritualfoundation.org";
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,13 @@
 import {defineChain} from "viem";
 
+/** RPC endpoints. Both the NEXT_PUBLIC_RPC_URL / NEXT_PUBLIC_WS_URL names used in
+ *  .env.local and the older NEXT_PUBLIC_RITUAL_* names are accepted, falling back to the
+ *  official public endpoints so the app works with either configuration. */
+export const RPC_HTTP_URL =
+  process.env.NEXT_PUBLIC_RPC_URL ?? process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? "https://rpc.ritualfoundation.org";
+export const RPC_WS_URL =
+  process.env.NEXT_PUBLIC_WS_URL ?? process.env.NEXT_PUBLIC_RITUAL_WS_URL ?? "wss://rpc.ritualfoundation.org/ws";
+
 /** Ritual Testnet, chain id 1979. Single source of chain configuration for the app. */
 export const ritualChain = defineChain({
   id: 1979,
@@ -7,8 +15,8 @@ export const ritualChain = defineChain({
   nativeCurrency: {name: "RITUAL", symbol: "RITUAL", decimals: 18},
   rpcUrls: {
     default: {
-      http: [process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? "https://rpc.ritualfoundation.org"],
-      webSocket: [process.env.NEXT_PUBLIC_RITUAL_WS_URL ?? "wss://rpc.ritualfoundation.org/ws"],
+      http: [RPC_HTTP_URL],
+      webSocket: [RPC_WS_URL],
     },
   },
   blockExplorers: {

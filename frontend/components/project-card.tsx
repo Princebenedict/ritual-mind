@@ -1,10 +1,14 @@
 import Link from "next/link";
 import {ArrowUpRight, ShieldCheck} from "lucide-react";
-import {MiniSpark} from "@/components/charts";
 import {Tag} from "@/components/ui/primitives";
 import type {Project} from "@/lib/types";
 import {compact, cn} from "@/lib/utils";
 
+/**
+ * A registered project, every field read from the ProjectRegistry. The on chain struct has
+ * no time series, so there is no sparkline; only the real scalar metrics the contract stores
+ * are shown. Growth is basis points from the agent, may be negative.
+ */
 export function ProjectCard({project}: {project: Project}) {
   const growthUp = project.growthRate >= 0;
   return (
@@ -27,14 +31,14 @@ export function ProjectCard({project}: {project: Project}) {
 
       <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-ink-muted">{project.description}</p>
 
-      <div className="mt-4">
-        <MiniSpark values={project.wauHistory} color={growthUp ? "#1E7A5A" : "#B23B2E"} />
-      </div>
-
-      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3">
+      <div className="mt-4 grid grid-cols-2 gap-x-2 gap-y-3 border-t border-line pt-4 sm:grid-cols-4">
         <div>
           <div className="text-[10px] font-bold uppercase tracking-wider text-ink-dim">Weekly active</div>
           <div className="mt-0.5 font-mono text-sm text-ink">{compact(project.weeklyActiveWallets)}</div>
+        </div>
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-ink-dim">Total txns</div>
+          <div className="mt-0.5 font-mono text-sm text-ink">{compact(project.totalTxns)}</div>
         </div>
         <div>
           <div className="text-[10px] font-bold uppercase tracking-wider text-ink-dim">Health</div>

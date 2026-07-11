@@ -1,0 +1,32 @@
+# Secrets — never commit
+.env
+.env.local
+*.env
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+dist/
+build/
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/lib/
+contracts/broadcast/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

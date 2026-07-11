@@ -16,8 +16,8 @@ export default function ExplorerPage() {
         <Card className="h-fit">
           <SectionLabel>Inspect an address</SectionLabel>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Paste any Ritual address to read its real balance, outgoing transaction count, and account type. A scored
-            directory of every wallet requires the reputation layer, which is not live yet, so it is not shown.
+            Paste any Ritual address to read its real balance, outgoing transaction count, and account type. For wallets
+            ranked by their on chain reputation, see the leaderboard, which reads the WalletRegistry directly.
           </p>
           <div className="mt-4">
             <WalletSearch size="md" />
