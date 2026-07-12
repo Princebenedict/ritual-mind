@@ -1,7 +1,7 @@
 import {encodeAbiParameters, decodeAbiParameters, toHex, type Address, type Hex} from "viem";
 import {PRECOMPILES, ritualChain} from "../config.js";
 import type {ChainClients} from "../chain/client.js";
-import {extractSpcOutput, unwrapEnvelope} from "./spc.js";
+import {waitForSpcOutput} from "./spc.js";
 
 /** HTTP method codes accepted by the precompile. Code 0 is invalid. */
 export const HTTP_METHOD = {GET: 1, POST: 2, PUT: 3, DELETE: 4, PATCH: 5, HEAD: 6, OPTIONS: 7} as const;
@@ -78,7 +78,7 @@ function decodeBody(body: Hex): string {
  * field, not from a callback.
  */
 export async function callHttp(clients: ChainClients, params: HttpRequestParams): Promise<HttpResult> {
-  const {walletClient, publicClient, account} = clients;
+  const {walletClient, account} = clients;
   const data = encodeHttpRequest(params);
 
   const hash = await walletClient.sendTransaction({
@@ -91,20 +91,13 @@ export async function callHttp(clients: ChainClients, params: HttpRequestParams)
     maxPriorityFeePerGas: 2_000_000_000n,
   });
 
-  const receipt = await publicClient.waitForTransactionReceipt({hash});
-  const raw = extractSpcOutput(receipt);
-  if (raw === null) {
-    throw new Error("HTTP precompile returned no spcCalls output");
-  }
-
-  const {actualOutput} = unwrapEnvelope(raw);
-  if (actualOutput === "0x") {
-    throw new Error("HTTP precompile output was empty. The call was simulated but not settled.");
-  }
+  // The settled receipt exposes the direct precompile response under spcCalls[].output;
+  // decode it straight against the response ABI (no (bytes, bytes) envelope unwrap).
+  const output = await waitForSpcOutput(clients, hash, PRECOMPILES.HTTP_CALL);
 
   const [statusCode, headerKeys, headerValues, body, errorMessage] = decodeAbiParameters(
     HTTP_RESPONSE_ABI,
-    actualOutput,
+    output,
   );
 
   const headers: Record<string, string> = {};

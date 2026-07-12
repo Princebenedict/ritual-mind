@@ -1,7 +1,7 @@
 import {encodeAbiParameters, decodeAbiParameters, parseAbiParameters, type Address, type Hex} from "viem";
 import {PRECOMPILES, ritualChain, LLM_MODEL} from "../config.js";
 import type {ChainClients} from "../chain/client.js";
-import {extractSpcOutput, unwrapEnvelope} from "./spc.js";
+import {waitForSpcOutput} from "./spc.js";
 
 /**
  * LLM precompile (0x0802) request ABI. Thirty fields. The base executor fields come
@@ -149,7 +149,7 @@ function decodeLlmOutput(actualOutput: Hex): LlmResult {
 
 /** Submit an LLM inference call and wait for the settled result from spcCalls. */
 export async function callLlm(clients: ChainClients, params: LlmRequestParams): Promise<LlmResult> {
-  const {walletClient, publicClient, account} = clients;
+  const {walletClient, account} = clients;
   const data = encodeLlmRequest(params);
 
   const hash = await walletClient.sendTransaction({
@@ -162,16 +162,11 @@ export async function callLlm(clients: ChainClients, params: LlmRequestParams): 
     maxPriorityFeePerGas: 2_000_000_000n,
   });
 
-  const receipt = await publicClient.waitForTransactionReceipt({hash});
-  const raw = extractSpcOutput(receipt);
-  if (raw === null) {
-    throw new Error("LLM precompile returned no spcCalls output");
-  }
+  // LLM (0x0802) is a two-phase async precompile: this tx records a commitment, the executor
+  // runs inference off chain, and the deferred origin tx settles with the result injected via
+  // the SPC mechanism. Await that settlement, then decode the direct response from the
+  // receipt's spcCalls[].output — there is no inline (bytes, bytes) envelope to unwrap.
+  const output = await waitForSpcOutput(clients, hash, PRECOMPILES.LLM);
 
-  const {actualOutput} = unwrapEnvelope(raw);
-  if (actualOutput === "0x") {
-    throw new Error("LLM precompile output was empty. The call was simulated but not settled.");
-  }
-
-  return decodeLlmOutput(actualOutput);
+  return decodeLlmOutput(output);
 }

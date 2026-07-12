@@ -97,8 +97,19 @@ export function loadConfig(): AgentConfig {
         .map((term) => term.trim())
         .filter((term) => term.length > 0),
     },
-    explorer: {
-      apiBaseUrl: optional("EXPLORER_API_URL", "https://explorer.ritualfoundation.org/api"),
+    scan: {
+      // How many recent blocks to index for precompile/dApp activity. Ritual has no
+      // public tx index (no explorer API, no Otterscan, trace_filter disabled) and
+      // historical state is pruned, so activity is read directly from block bodies
+      // over a bounded recent window. Default ~500k blocks (~1 day at ~0.2s/block).
+      windowBlocks: BigInt(optional("SCAN_WINDOW_BLOCKS", "500000")),
+      // Hard cap on block bodies fetched in a single index build/extend pass.
+      maxBlocksPerScan: BigInt(optional("SCAN_MAX_BLOCKS", "500000")),
+      // Blocks requested per JSON-RPC batch, and how many batches run concurrently.
+      batchSize: Number(optional("SCAN_BATCH_SIZE", "200")),
+      concurrency: Number(optional("SCAN_CONCURRENCY", "20")),
+      // Cap on CREATE-address derivation when counting deployed contracts.
+      maxDeriveNonce: Number(optional("SCAN_MAX_DERIVE_NONCE", "5000")),
     },
     ipfs: {
       pinataJwt: optional("PINATA_JWT", ""),
@@ -128,8 +139,12 @@ export interface AgentConfig {
     twitterBearerToken: string;
     twitterSearchTerms: string[];
   };
-  explorer: {
-    apiBaseUrl: string;
+  scan: {
+    windowBlocks: bigint;
+    maxBlocksPerScan: bigint;
+    batchSize: number;
+    concurrency: number;
+    maxDeriveNonce: number;
   };
   ipfs: {
     pinataJwt: string;

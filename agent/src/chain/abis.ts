@@ -302,6 +302,16 @@ export const RITUAL_WALLET_ABI = [
   },
 ] as const;
 
+export const ASYNC_JOB_TRACKER_ABI = [
+  {
+    type: "function",
+    name: "hasPendingJobForSender",
+    stateMutability: "view",
+    inputs: [{name: "sender", type: "address"}],
+    outputs: [{type: "bool"}],
+  },
+] as const;
+
 export const TEE_SERVICE_REGISTRY_ABI = [
   {
     type: "function",

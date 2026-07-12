@@ -228,12 +228,14 @@ async function readAttestationsGiven(clients: ChainClients, config: AgentConfig,
 function defaultScan(wallet: Address): OnChainScan {
   return {
     wallet,
+    balanceWei: 0n,
     balanceRitual: 0,
     txCount: 0,
     contractsDeployed: 0,
     uniquePrecompilesUsed: 0,
     precompilesUsedAsUser: 0,
     uniqueDappsUsed: 0,
+    firstActivityUnix: 0,
     lastActivityUnix: 0,
   };
 }
