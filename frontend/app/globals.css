@@ -13,7 +13,7 @@
   --font-inter: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", monospace;
 
-  /* Dark theme (default) — deep teal-black canvas, luminous editorial ink. */
+  /* Dark theme (default). Deep teal-black canvas, luminous editorial ink. */
   --bg-base: 7 14 12;
   --bg-raised: 16 25 23;
   --bg-sunken: 4 9 8;
@@ -45,7 +45,7 @@
 }
 
 :root[data-theme="light"] {
-  /* Light theme — warm off-white canvas, pure white cards, muted teal accent. */
+  /* Light theme. Warm off-white canvas, pure white cards, muted teal accent. */
   --bg-base: 245 243 239;
   --bg-raised: 255 255 255;
   --bg-sunken: 239 237 231;

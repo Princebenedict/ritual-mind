@@ -3,7 +3,7 @@
 import {type ReactNode, useEffect} from "react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {Boxes, Compass, LayoutDashboard, Sparkles, Trophy} from "lucide-react";
+import {Compass, Cpu, Package, Sparkles, Trophy} from "lucide-react";
 import {Sidebar} from "./sidebar";
 import {Topbar} from "./topbar";
 import {CommandPalette} from "./command-palette";
@@ -15,8 +15,8 @@ const MOBILE_NAV = [
   {href: "/", label: "Home", icon: Sparkles},
   {href: "/explorer", label: "Explorer", icon: Compass},
   {href: "/leaderboard", label: "Ranks", icon: Trophy},
-  {href: "/projects", label: "Projects", icon: Boxes},
-  {href: "/dashboard", label: "You", icon: LayoutDashboard},
+  {href: "/developers", label: "Developers", icon: Cpu},
+  {href: "/sdk", label: "SDK", icon: Package},
 ];
 
 export function Shell({children}: {children: ReactNode}) {

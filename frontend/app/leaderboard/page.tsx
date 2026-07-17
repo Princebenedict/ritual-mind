@@ -6,9 +6,10 @@ import {Container, PageHeader} from "@/components/page";
 import {Unavailable} from "@/components/unavailable";
 import {Skeleton, Tag} from "@/components/ui/primitives";
 import {LeaderboardTable, type LeaderMetric} from "@/components/leaderboard-table";
-import {useLeaderboard, useTotalRegistered} from "@/lib/hooks";
+import {useDiscoveredProfiles, useLeaderboard, useTotalRegistered} from "@/lib/hooks";
 import {CONTRACTS, explorerAddress} from "@/lib/chain";
 import {cn} from "@/lib/utils";
+import type {WalletProfile} from "@/lib/types";
 
 const METRICS: {key: LeaderMetric; label: string}[] = [
   {key: "composite", label: "Composite"},
@@ -22,18 +23,28 @@ export default function LeaderboardPage() {
   const [metric, setMetric] = useState<LeaderMetric>("composite");
   const {data: total} = useTotalRegistered();
   const {data: wallets, isLoading, isError} = useLeaderboard(50);
+  const {data: discovered} = useDiscoveredProfiles();
 
+  // Merge the contract's ranked top wallets with any wallets this browser has searched that now
+  // have a real score, de-duplicated by address, then rank by the selected metric. Searched
+  // wallets persist across visits, so once scored they stay in the ranking going forward.
   const ranked = useMemo(() => {
     if (wallets === undefined) return [];
-    return [...wallets].sort((a, b) => b[metric] - a[metric]);
-  }, [wallets, metric]);
+    const byAddress = new Map<string, WalletProfile>();
+    for (const wallet of wallets) byAddress.set(wallet.address.toLowerCase(), wallet);
+    for (const wallet of discovered ?? []) {
+      const key = wallet.address.toLowerCase();
+      if (!byAddress.has(key)) byAddress.set(key, wallet);
+    }
+    return [...byAddress.values()].sort((a, b) => b[metric] - a[metric]);
+  }, [wallets, discovered, metric]);
 
   return (
     <Container className="pb-16" wide>
       <PageHeader
         eyebrow="Ranking"
         title="Leaderboard"
-        description="Wallets ranked by the reputation the agent computes from their on-chain activity, read directly from the WalletRegistry. You never register — wallets are discovered and scored automatically, and nothing is estimated."
+        description="Wallets ranked by the reputation the agent computes from on-chain activity, read directly from the WalletRegistry. There is no registration and no manual step. Search a wallet on the Explorer and it is added to the ranking automatically once it has an on-chain score. Nothing is estimated."
         actions={
           <a
             href={explorerAddress(CONTRACTS.walletRegistry)}
@@ -76,8 +87,9 @@ export default function LeaderboardPage() {
         ) : ranked.length === 0 ? (
           <Unavailable title="No wallets scored yet">
             The agent has not scored any wallets yet, so there is no ranking to show. This table fills in automatically
-            after the agent&apos;s next scan of the network. Nobody registers — wallets are discovered from their
-            on-chain activity. The count above is read live from the contract.
+            after the agent&apos;s next scan of the network. Nobody registers. Wallets are discovered from their on-chain
+            activity, and any wallet you search on the Explorer is added here once it has an on-chain score. The count
+            above is read live from the contract.
           </Unavailable>
         ) : (
           <LeaderboardTable wallets={ranked} metric={metric} />

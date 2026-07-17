@@ -16,6 +16,7 @@ import {
   contractsConfigured,
   getActivityEmitterEvents,
   getLatestScoreEvidence,
+  getProfilesForAddresses,
   getProject,
   getRecentRitualMindEvents,
   getScoreHistory,
@@ -26,6 +27,7 @@ import {
   getWalletProfile,
   type RmEvent,
 } from "./contracts";
+import {useDiscovered} from "./discovered";
 import type {Address} from "./types";
 
 /**
@@ -108,6 +110,22 @@ export function useLeaderboard(count = 50) {
     queryKey: ["leaderboard", count],
     queryFn: () => getTopProfiles(count),
     enabled: contractsConfigured(),
+    staleTime: 30000,
+  });
+}
+
+/**
+ * Live profiles for the wallets this browser has searched ("discovered"). The leaderboard
+ * merges these with the contract's top wallets so a searched-and-scored address stays in the
+ * ranking going forward, with no registration. Scores are read fresh from the WalletRegistry;
+ * any discovered address without a real score is dropped, so nothing here is fabricated.
+ */
+export function useDiscoveredProfiles() {
+  const discovered = useDiscovered();
+  return useQuery({
+    queryKey: ["discovered-profiles", discovered.join(",")],
+    queryFn: () => getProfilesForAddresses(discovered),
+    enabled: contractsConfigured() && discovered.length > 0,
     staleTime: 30000,
   });
 }

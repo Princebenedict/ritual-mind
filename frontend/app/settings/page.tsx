@@ -28,7 +28,7 @@ export default function SettingsPage() {
           <SectionLabel>No wallet, no registration</SectionLabel>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             You never connect a wallet or register anything here. To inspect an address, paste it into the search at the
-            top or on the Explorer. Reputation scores are computed by the agent from public on-chain activity — wallets
+            top or on the Explorer. Reputation scores are computed by the agent from public on-chain activity. Wallets
             are discovered and scored automatically, so there is nothing for a person to sign up for.
           </p>
         </Card>

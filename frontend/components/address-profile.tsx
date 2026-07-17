@@ -1,7 +1,9 @@
 "use client";
 
+import {useEffect} from "react";
 import {ArrowUpRight, Boxes, FileCode2, User, Wallet} from "lucide-react";
 import {useAddressOverview, useScoreEvidence, useWalletProfile, contractsConfigured} from "@/lib/hooks";
+import {addDiscovered} from "@/lib/discovered";
 import {contractEvidence} from "@/lib/contracts";
 import {MonoAddress} from "@/components/ui/mono";
 import {Card, SectionLabel, Skeleton, Tag} from "@/components/ui/primitives";
@@ -50,7 +52,7 @@ function ReputationSection({address}: {address: string}) {
   if (!registered) {
     return (
       <Unavailable title="Not scored yet">
-        The agent has not scored this address yet, so it has no reputation score. You do not register or sign up — the
+        The agent has not scored this address yet, so it has no reputation score. You do not register or sign up. The
         agent discovers wallets from their on-chain activity, and this view fills in automatically after it scores this
         one. Nothing is estimated.
       </Unavailable>
@@ -112,6 +114,12 @@ function ReputationSection({address}: {address: string}) {
 
 export function AddressProfile({address}: {address: string}) {
   const {data, isLoading, isError} = useAddressOverview(address);
+
+  // Remember every searched wallet so the leaderboard can surface it going forward, once it has
+  // a real on-chain score. Only the address is stored; the score itself is always read live.
+  useEffect(() => {
+    addDiscovered(address);
+  }, [address]);
 
   const accountType = (): {label: string; icon: typeof User; tone: "brand" | "info" | "neutral"} => {
     if (data === undefined) return {label: "Account", icon: User, tone: "neutral"};

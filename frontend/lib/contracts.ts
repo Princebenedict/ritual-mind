@@ -352,6 +352,16 @@ export async function getTopProfiles(count = 50): Promise<WalletProfile[]> {
   return profiles.filter((profile): profile is WalletProfile => profile !== null);
 }
 
+/** Full profiles for a specific set of addresses (e.g. wallets a visitor has searched), each
+ *  read live from the WalletRegistry. Unregistered addresses resolve to null and are dropped,
+ *  so an address only surfaces once it genuinely has an on-chain score. Never fabricates. */
+export async function getProfilesForAddresses(addresses: string[]): Promise<WalletProfile[]> {
+  if (!contractsConfigured() || addresses.length === 0) return [];
+  const valid = addresses.filter((address) => isAddress(address)) as Address[];
+  const profiles = await Promise.all(valid.map((address) => getWalletProfile(address).catch(() => null)));
+  return profiles.filter((profile): profile is WalletProfile => profile !== null);
+}
+
 function mapProject(raw: {
   contractAddress: Address;
   deployer: Address;
