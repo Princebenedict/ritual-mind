@@ -5,7 +5,7 @@ export function Card({className, children, interactive = false}: {className?: st
   return (
     <div
       className={cn(
-        "rounded-2xl border border-black/[0.06] bg-white p-6 shadow-soft",
+        "rounded-2xl border border-line bg-card p-6 shadow-soft",
         interactive && "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg",
         className,
       )}
@@ -16,7 +16,7 @@ export function Card({className, children, interactive = false}: {className?: st
 }
 
 export function Panel({className, children}: {className?: string; children: ReactNode}) {
-  return <div className={cn("rounded-2xl border border-black/[0.06] bg-white", className)}>{children}</div>;
+  return <div className={cn("rounded-2xl border border-line bg-card", className)}>{children}</div>;
 }
 
 export function SectionLabel({children, className}: {children: ReactNode; className?: string}) {
@@ -32,7 +32,7 @@ export function Divider({className}: {className?: string}) {
 type TagTone = "neutral" | "brand" | "good" | "bad" | "agent" | "data" | "gold" | "info";
 
 const TAG_TONE: Record<TagTone, string> = {
-  neutral: "border-black/[0.08] text-ink-muted bg-black/[0.02]",
+  neutral: "border-line text-ink-muted bg-ink/[0.03]",
   brand: "border-brand/20 text-brand bg-brand/[0.08]",
   good: "border-good/20 text-good bg-good/[0.08]",
   bad: "border-bad/20 text-bad bg-bad/[0.08]",
@@ -60,7 +60,7 @@ type ButtonVariant = "brand" | "ghost" | "danger";
 
 const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   brand: "border-brand/25 bg-brand/[0.10] text-brand shadow-soft hover:bg-brand/[0.16] hover:border-brand/40",
-  ghost: "border-black/[0.08] bg-white text-ink-muted shadow-soft hover:border-black/[0.16] hover:text-ink",
+  ghost: "border-line bg-card text-ink-muted shadow-soft hover:border-line-bright hover:text-ink",
   danger: "border-bad/25 bg-bad/[0.06] text-bad hover:bg-bad/[0.12]",
 };
 

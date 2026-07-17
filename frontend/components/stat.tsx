@@ -24,7 +24,7 @@ export function StatCard({
   // props. Server components cannot pass a function across the boundary.
   const format = decimals !== undefined ? (n: number): string => n.toFixed(decimals) : undefined;
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg">
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg">
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">{label}</span>
         {icon !== undefined ? <span className="text-ink-dim">{icon}</span> : null}

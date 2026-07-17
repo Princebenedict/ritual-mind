@@ -14,7 +14,7 @@ export function ProjectCard({project}: {project: Project}) {
   return (
     <Link
       href={`/projects/${project.address}`}
-      className="group block rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg"
+      className="group block rounded-2xl border border-line bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg"
     >
       <div className="flex items-start justify-between gap-3">
         <div>

@@ -48,7 +48,7 @@ export default function LandingPage() {
       <Container className="pt-12 sm:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[11px] text-ink-muted shadow-soft">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-card px-3.5 py-1.5 text-[11px] text-ink-muted shadow-soft">
               <span className="h-1.5 w-1.5 rounded-full bg-good" />
               Live on Ritual Network, chain 1979
             </div>
@@ -114,7 +114,7 @@ export default function LandingPage() {
       {/* Reputation, honest pending state */}
       <Container className="pt-16">
         <Reveal>
-          <div className="rounded-3xl border border-black/[0.06] bg-white p-8 shadow-soft sm:p-10">
+          <div className="rounded-3xl border border-line bg-card p-8 shadow-soft sm:p-10">
             <SectionLabel>Reputation</SectionLabel>
             <h2 className="mt-2 max-w-2xl text-2xl font-bold sm:text-3xl">
               Reputation is computed in the enclave and attested on chain.
@@ -127,7 +127,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {MODEL.map((component) => (
-                <div key={component.name} className="rounded-2xl border border-black/[0.06] bg-bg-base p-4">
+                <div key={component.name} className="rounded-2xl border border-line bg-bg-base p-4">
                   <div className="flex items-baseline justify-between">
                     <span className="text-sm font-bold text-ink">{component.name}</span>
                     <span className="font-mono text-xs text-ink-dim">/ {component.ceiling}</span>
@@ -149,7 +149,7 @@ export default function LandingPage() {
             return (
               <Reveal key={item.title}>
                 <div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-black/[0.06] bg-white text-brand shadow-soft">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-card text-brand shadow-soft">
                     <Icon size={18} strokeWidth={1.75} />
                   </div>
                   <h3 className="mt-5 text-lg font-bold">{item.title}</h3>
@@ -163,7 +163,7 @@ export default function LandingPage() {
 
       {/* CTA */}
       <Container className="pb-20">
-        <div className="relative overflow-hidden rounded-3xl border border-black/[0.06] bg-gradient-to-br from-white to-[#FBFAF8] p-8 shadow-soft sm:p-12">
+        <div className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-card to-surface p-8 shadow-soft sm:p-12">
           <div className="relative max-w-2xl">
             <h2 className="text-2xl font-bold sm:text-3xl">Bring reputation into your app.</h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">

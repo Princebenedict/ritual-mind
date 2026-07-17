@@ -14,7 +14,7 @@ import type {Address} from "@/lib/types";
 
 function Metric({label, value, sub}: {label: string; value: string; sub?: string}) {
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft">
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft">
       <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">{label}</div>
       <div className="mt-2 font-mono text-lg font-bold tabular text-ink">{value}</div>
       {sub !== undefined ? <div className="mt-1 text-xs text-ink-dim">{sub}</div> : null}
@@ -49,10 +49,10 @@ function ReputationSection({address}: {address: string}) {
   }
   if (!registered) {
     return (
-      <Unavailable title="Not registered with Ritual Mind">
-        This address has not registered with the WalletRegistry, so it has no reputation score yet. The registry is live
-        on chain, and this view fills in automatically once the wallet registers and the agent scores it. Nothing is
-        estimated.
+      <Unavailable title="Not scored yet">
+        The agent has not scored this address yet, so it has no reputation score. You do not register or sign up — the
+        agent discovers wallets from their on-chain activity, and this view fills in automatically after it scores this
+        one. Nothing is estimated.
       </Unavailable>
     );
   }
@@ -126,9 +126,9 @@ export function AddressProfile({address}: {address: string}) {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 border-b border-black/[0.06] pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-black/[0.06] bg-white text-brand shadow-soft">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-card text-brand shadow-soft">
             <AccountIcon size={20} strokeWidth={1.75} />
           </div>
           <div>

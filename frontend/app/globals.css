@@ -2,16 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Theme tokens. Every color is stored as space separated RGB channels so Tailwind can
+ * apply opacity modifiers (bg-brand/[0.08]) against a variable. The default :root is the
+ * dark theme, which is Ritual's native look, so the app renders dark even before hydration
+ * and there is no flash. A stored "light" preference sets data-theme="light" on <html>
+ * before paint (see the inline script in layout.tsx) and swaps the whole palette.
+ */
 :root {
   --font-inter: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo", monospace;
-  --bg-base: #f5f3ef;
-  --bg-raised: #ffffff;
-  --surface: #fbfaf8;
-  --ink: #1a1a1a;
-  --ink-muted: #6b6b6b;
-  --ink-dim: #757575;
-  --brand: #256e60;
+
+  /* Dark theme (default) — deep teal-black canvas, luminous editorial ink. */
+  --bg-base: 7 14 12;
+  --bg-raised: 16 25 23;
+  --bg-sunken: 4 9 8;
+  --surface: 12 20 18;
+  --surface-strong: 22 33 30;
+  --card: 16 25 23;
+  --ink: 233 236 235;
+  --ink-muted: 168 176 174;
+  --ink-dim: 139 147 145;
+  --brand: 62 180 154;
+  --good: 53 196 138;
+  --bad: 240 121 106;
+  --info: 91 166 224;
+  --agent: 164 143 224;
+  --data: 79 190 206;
+  --gold: 227 192 90;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-bright: rgba(255, 255, 255, 0.17);
+
+  /* Ambient canvas layers */
+  --amb-1: 11 21 19;
+  --amb-2: 7 14 12;
+  --amb-3: 4 9 8;
+  --amb-grid: rgba(255, 255, 255, 0.03);
+  --amb-glow: rgba(62, 180, 154, 0.12);
+  --amb-glow-2: rgba(79, 190, 206, 0.07);
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  /* Light theme — warm off-white canvas, pure white cards, muted teal accent. */
+  --bg-base: 245 243 239;
+  --bg-raised: 255 255 255;
+  --bg-sunken: 239 237 231;
+  --surface: 251 250 248;
+  --surface-strong: 255 255 255;
+  --card: 255 255 255;
+  --ink: 26 26 26;
+  --ink-muted: 107 107 107;
+  --ink-dim: 117 117 117;
+  --brand: 37 110 96;
+  --good: 30 122 90;
+  --bad: 178 59 46;
+  --info: 47 109 166;
+  --agent: 106 87 160;
+  --data: 44 126 140;
+  --gold: 138 109 34;
+  --line: rgba(0, 0, 0, 0.06);
+  --line-bright: rgba(0, 0, 0, 0.12);
+
+  --amb-1: 251 250 248;
+  --amb-2: 245 243 239;
+  --amb-3: 241 239 233;
+  --amb-grid: rgba(0, 0, 0, 0.028);
+  --amb-glow: rgba(158, 217, 206, 0.3);
+  --amb-glow-2: rgba(214, 196, 158, 0.16);
+
   color-scheme: light;
 }
 
@@ -21,16 +81,17 @@
   }
 
   body {
-    color: var(--ink);
-    background-color: var(--bg-base);
+    color: rgb(var(--ink));
+    background-color: rgb(var(--bg-base));
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
+  /* Colors flip with the theme because they read the ink/brand channels. */
   ::selection {
-    background: rgba(37, 110, 96, 0.16);
-    color: #1a1a1a;
+    background: rgb(var(--brand) / 0.18);
+    color: rgb(var(--ink));
   }
 
   ::-webkit-scrollbar {
@@ -41,21 +102,21 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.14);
+    background: rgb(var(--ink) / 0.16);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.24);
+    background: rgb(var(--ink) / 0.28);
     background-clip: padding-box;
   }
 
   :focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 2px var(--bg-base),
-      0 0 0 4px rgba(37, 110, 96, 0.55);
+      0 0 0 2px rgb(var(--bg-base)),
+      0 0 0 4px rgb(var(--brand) / 0.55);
     border-radius: 10px;
   }
 }
@@ -70,11 +131,16 @@
   }
 
   .hairline {
-    background: linear-gradient(90deg, rgba(37, 110, 96, 0.28), rgba(0, 0, 0, 0.06) 40%, transparent);
+    background: linear-gradient(90deg, rgb(var(--brand) / 0.28), rgb(var(--ink) / 0.06) 40%, transparent);
   }
 
   .skeleton {
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.04) 25%, rgba(0, 0, 0, 0.08) 37%, rgba(0, 0, 0, 0.04) 63%);
+    background: linear-gradient(
+      90deg,
+      rgb(var(--ink) / 0.04) 25%,
+      rgb(var(--ink) / 0.08) 37%,
+      rgb(var(--ink) / 0.04) 63%
+    );
     background-size: 400% 100%;
   }
 

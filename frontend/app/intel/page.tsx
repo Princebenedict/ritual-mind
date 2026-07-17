@@ -2,52 +2,73 @@
 
 import {ArrowUpRight, FileText} from "lucide-react";
 import {Container, PageHeader} from "@/components/page";
-import {Unavailable} from "@/components/unavailable";
-import {SectionLabel, Skeleton} from "@/components/ui/primitives";
+import {SectionLabel, Tag} from "@/components/ui/primitives";
+import {INTEL_FEED, type IntelTag} from "@/lib/intel-feed";
 import {useRitualMindEvents} from "@/lib/hooks";
-import {CONTRACTS, explorerAddress, explorerTx} from "@/lib/chain";
+import {explorerTx} from "@/lib/chain";
 import {shortHash} from "@/lib/rpc";
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** UTC formatting keeps server and client output identical (no hydration mismatch). */
+function formatMonth(iso: string): string {
+  const d = new Date(iso);
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+const TAG_TONE: Record<IntelTag, "brand" | "info" | "agent" | "data" | "gold"> = {
+  Announcement: "brand",
+  Product: "info",
+  Ecosystem: "agent",
+  Research: "data",
+  Funding: "gold",
+};
+
 export default function IntelPage() {
-  const {data: events, isLoading, isError} = useRitualMindEvents();
+  const {data: events} = useRitualMindEvents();
   const digests = (events ?? []).filter((event) => event.kind === "DigestPosted");
+
+  const items = [...INTEL_FEED].sort((a, b) => b.iso.localeCompare(a.iso));
 
   return (
     <Container className="pb-16" wide>
       <PageHeader
         eyebrow="Intelligence"
         title="Intel"
-        description="Daily ecosystem briefs written by the agent inside the enclave and posted on chain with a TEE attestation hash. Read from the ActivityEmitter, never fabricated."
-        actions={
-          <a
-            href={explorerAddress(CONTRACTS.activityEmitter)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-ink-muted hover:text-brand"
-          >
-            ActivityEmitter <ArrowUpRight size={13} />
-          </a>
-        }
+        description="A curated briefing of real Ritual ecosystem news, plus on-chain digests written by the agent when it posts them."
       />
 
-      <div className="mt-6">
-        {isError ? (
-          <Unavailable title="Intel could not be read">
-            The ActivityEmitter did not respond. Digests are only ever shown from a real event read, so nothing is
-            displayed until the read succeeds.
-          </Unavailable>
-        ) : isLoading || events === undefined ? (
-          <Skeleton className="h-40 w-full" />
-        ) : digests.length === 0 ? (
-          <Unavailable title="No digests posted yet">
-            The ActivityEmitter is live on chain, and this fills in automatically once the agent posts its first daily
-            digest. Each digest is written to IPFS and referenced on chain with a TEE attestation hash. Nothing here is
-            fabricated.
-          </Unavailable>
-        ) : (
-          <div className="space-y-3">
+      <div className="mt-6 space-y-3">
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={item.url}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex flex-col gap-2 rounded-2xl border border-line bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-soft-lg sm:flex-row sm:items-start sm:gap-5"
+          >
+            <div className="flex w-28 shrink-0 flex-col gap-2">
+              <Tag tone={TAG_TONE[item.tag]}>{item.tag}</Tag>
+              <span className="font-mono text-xs text-ink-dim">{formatMonth(item.iso)}</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-bold text-ink group-hover:text-brand">
+                {item.title}
+                <ArrowUpRight size={13} className="ml-1 inline align-[-1px] text-ink-dim group-hover:text-brand" />
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{item.summary}</p>
+              <span className="mt-2 inline-block text-xs text-ink-dim">{item.source}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {digests.length > 0 ? (
+        <div className="mt-10">
+          <SectionLabel>On-chain digests</SectionLabel>
+          <div className="mt-3 space-y-3">
             {digests.map((digest) => (
-              <div key={digest.id} className="flex items-start gap-4 rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft">
+              <div key={digest.id} className="flex items-start gap-4 rounded-2xl border border-line bg-card p-5 shadow-soft">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-brand/20 bg-brand/[0.06] text-brand">
                   <FileText size={18} />
                 </div>
@@ -69,7 +90,16 @@ export default function IntelPage() {
               </div>
             ))}
           </div>
-        )}
+        </div>
+      ) : null}
+
+      <div className="mt-8 rounded-2xl border border-line bg-ink/[0.02] px-5 py-4">
+        <SectionLabel>Post your own</SectionLabel>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
+          The briefing is a plain data file, so you publish updates yourself — no backend, no wallet. Add an entry at the
+          top of <span className="font-mono text-ink">lib/intel-feed.ts</span> with a link to the real post, and it goes
+          live on the next deploy. On-chain digests from the agent appear above automatically.
+        </p>
       </div>
     </Container>
   );

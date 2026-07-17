@@ -33,7 +33,7 @@ export default function LeaderboardPage() {
       <PageHeader
         eyebrow="Ranking"
         title="Leaderboard"
-        description="Wallets ranked by their attested on chain reputation, read directly from the WalletRegistry. Only registered, scored wallets appear, and nothing is estimated."
+        description="Wallets ranked by the reputation the agent computes from their on-chain activity, read directly from the WalletRegistry. You never register — wallets are discovered and scored automatically, and nothing is estimated."
         actions={
           <a
             href={explorerAddress(CONTRACTS.walletRegistry)}
@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
             </button>
           ))}
         </div>
-        {typeof total === "number" ? <Tag tone="neutral">{total.toLocaleString("en-US")} registered</Tag> : null}
+        {typeof total === "number" ? <Tag tone="neutral">{total.toLocaleString("en-US")} scored</Tag> : null}
       </div>
 
       <div className="mt-4">
@@ -74,10 +74,10 @@ export default function LeaderboardPage() {
         ) : isLoading || wallets === undefined ? (
           <Skeleton className="h-72 w-full" />
         ) : ranked.length === 0 ? (
-          <Unavailable title="No wallets registered yet">
-            No wallet has registered with the WalletRegistry, so there is no ranking to show. This table fills in
-            automatically as wallets register and the agent scores them. The registered count above is read live from
-            the contract.
+          <Unavailable title="No wallets scored yet">
+            The agent has not scored any wallets yet, so there is no ranking to show. This table fills in automatically
+            after the agent&apos;s next scan of the network. Nobody registers — wallets are discovered from their
+            on-chain activity. The count above is read live from the contract.
           </Unavailable>
         ) : (
           <LeaderboardTable wallets={ranked} metric={metric} />

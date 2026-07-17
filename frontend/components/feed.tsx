@@ -56,7 +56,7 @@ function TxRow({tx}: {tx: ChainTx}) {
     <div className="flex items-start gap-3 px-4 py-3">
       <div
         className={cn(
-          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-black/[0.03]",
+          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-ink/[0.04]",
           accent,
         )}
       >
@@ -157,8 +157,8 @@ export function LiveFeed({limit = 14}: {limit?: number}) {
           : "connecting";
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-soft">
-      <div className="flex items-center justify-between border-b border-black/[0.06] px-5 py-3.5">
+    <div className="overflow-hidden rounded-2xl border border-line bg-card shadow-soft">
+      <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
         <span className="text-sm font-bold text-ink">Live network activity</span>
         <span className="flex items-center gap-1.5 text-[11px] text-ink-dim">
           <span className="relative flex h-1.5 w-1.5">
@@ -197,7 +197,7 @@ export function LiveFeed({limit = 14}: {limit?: number}) {
           </Unavailable>
         </div>
       ) : (
-        <div className="divide-y divide-black/[0.05]">
+        <div className="divide-y divide-line">
           <AnimatePresence initial={false}>
             {shown.map((item) => (
               <motion.div

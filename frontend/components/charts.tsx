@@ -42,12 +42,12 @@ export function HistoryChart({history}: {history: ScoreSnapshot[]}) {
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-full w-full">
         <defs>
           <linearGradient id="composite-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#256E60" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="#256E60" stopOpacity={0} />
+            <stop offset="0%" stopColor="rgb(var(--brand))" stopOpacity={0.22} />
+            <stop offset="100%" stopColor="rgb(var(--brand))" stopOpacity={0} />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#composite-fill)" />
-        <path d={path} fill="none" stroke="#256E60" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+        <path d={path} fill="none" stroke="rgb(var(--brand))" strokeWidth={2} vectorEffect="non-scaling-stroke" />
       </svg>
       <div className="mt-1 flex justify-between font-mono text-[11px] text-ink-dim">
         <span>{first !== undefined ? dateLabel(first.timestamp) : ""}</span>
@@ -108,8 +108,8 @@ export function SentimentChart({data}: {data: Array<{t: number; bullish: number;
   return (
     <div className="h-64 w-full">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-full w-full">
-        <path d={linePath(bullish, W, H)} fill="none" stroke="#1E7A5A" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-        <path d={linePath(cautious, W, H)} fill="none" stroke="#8A6D22" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+        <path d={linePath(bullish, W, H)} fill="none" stroke="rgb(var(--good))" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+        <path d={linePath(cautious, W, H)} fill="none" stroke="rgb(var(--gold))" strokeWidth={2} vectorEffect="non-scaling-stroke" />
       </svg>
       <div className="mt-1 flex justify-between font-mono text-[11px] text-ink-dim">
         <span>{dateLabel(data[0]!.t)}</span>
@@ -120,7 +120,7 @@ export function SentimentChart({data}: {data: Array<{t: number; bullish: number;
 }
 
 /** Compact sparkline for a series of values. */
-export function MiniSpark({values, color = "#1E7A5A"}: {values: number[]; color?: string}) {
+export function MiniSpark({values, color = "rgb(var(--good))"}: {values: number[]; color?: string}) {
   if (values.length === 0) return <div className="h-10 w-full" />;
   const W = 200;
   const H = 40;

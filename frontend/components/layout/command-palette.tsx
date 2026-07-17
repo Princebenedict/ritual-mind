@@ -65,7 +65,7 @@ export function CommandPalette() {
             animate={{opacity: 1, y: 0, scale: 1}}
             exit={{opacity: 0, y: -8}}
             transition={{duration: 0.18, ease: [0.16, 1, 0.3, 1]}}
-            className="w-full max-w-xl overflow-hidden rounded-3xl border border-black/[0.08] bg-white shadow-soft-lg"
+            className="w-full max-w-xl overflow-hidden rounded-3xl border border-line bg-card shadow-soft-lg"
             onClick={(event) => event.stopPropagation()}
           >
             <form
@@ -74,7 +74,7 @@ export function CommandPalette() {
                 const first = results[0];
                 if (first !== undefined) select(first);
               }}
-              className="flex items-center gap-3 border-b border-black/[0.06] px-5"
+              className="flex items-center gap-3 border-b border-line px-5"
             >
               <Search size={16} className="text-ink-dim" />
               <input
@@ -84,7 +84,7 @@ export function CommandPalette() {
                 placeholder="Paste an address, or search pages"
                 className="h-12 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-dim"
               />
-              <kbd className="rounded-lg border border-black/[0.08] px-1.5 py-0.5 font-mono text-[10px] text-ink-dim">Esc</kbd>
+              <kbd className="rounded-lg border border-line px-1.5 py-0.5 font-mono text-[10px] text-ink-dim">Esc</kbd>
             </form>
             <ul className="max-h-80 overflow-y-auto p-2">
               {results.length === 0 ? (
@@ -95,7 +95,7 @@ export function CommandPalette() {
                     <button
                       type="button"
                       onClick={() => select(result)}
-                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-black/[0.03]"
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-ink/[0.04]"
                     >
                       {result.kind === "address" ? (
                         <Wallet size={15} className="text-brand" />

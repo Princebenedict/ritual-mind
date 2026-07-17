@@ -34,8 +34,8 @@ export function WalletSearch({size = "lg"}: {size?: "lg" | "md"}) {
           submit();
         }}
         className={cn(
-          "flex items-center gap-2.5 rounded-2xl border bg-white pl-5 pr-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] transition-all focus-within:border-brand/40 focus-within:shadow-soft",
-          error ? "border-bad/50" : "border-black/[0.08]",
+          "flex items-center gap-2.5 rounded-2xl border bg-card pl-5 pr-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] transition-all focus-within:border-brand/40 focus-within:shadow-soft",
+          error ? "border-bad/50" : "border-line",
           size === "lg" ? "h-16" : "h-12",
         )}
       >

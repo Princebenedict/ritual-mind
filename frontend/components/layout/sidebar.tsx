@@ -12,7 +12,7 @@ export function Sidebar() {
 
   return (
     <div className="sticky top-0 hidden h-screen shrink-0 p-3 lg:block">
-      <aside className="flex h-full w-56 flex-col rounded-3xl border border-black/[0.06] bg-white shadow-soft">
+      <aside className="flex h-full w-56 flex-col rounded-3xl border border-line bg-card shadow-soft">
         <Link href="/" className="flex items-center gap-2.5 px-5 py-6">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-brand/15 bg-brand/[0.08] text-brand">
             <Logo size={18} />
@@ -41,7 +41,7 @@ export function Sidebar() {
                         href={item.href}
                         className={cn(
                           "relative z-10 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-                          active ? "text-brand" : "text-ink-muted hover:bg-black/[0.03] hover:text-ink",
+                          active ? "text-brand" : "text-ink-muted hover:bg-ink/[0.04] hover:text-ink",
                         )}
                       >
                         <Icon size={17} strokeWidth={1.5} />
@@ -55,7 +55,7 @@ export function Sidebar() {
           ))}
         </nav>
 
-        <div className="mx-3 mb-3 rounded-2xl border border-black/[0.05] bg-black/[0.02] px-4 py-3">
+        <div className="mx-3 mb-3 rounded-2xl border border-line bg-ink/[0.03] px-4 py-3">
           <div className="flex items-center gap-2 text-[11px] text-ink-dim">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-good/50" />

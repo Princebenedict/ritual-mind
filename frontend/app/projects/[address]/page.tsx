@@ -17,7 +17,7 @@ import type {Address} from "@/lib/types";
 
 function Metric({label, value, tone}: {label: string; value: string; tone?: string}) {
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft">
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft">
       <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">{label}</div>
       <div className={`mt-2 font-mono text-lg font-bold tabular ${tone ?? "text-ink"}`}>{value}</div>
     </div>

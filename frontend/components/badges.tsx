@@ -37,7 +37,7 @@ export function BadgeGrid({earned, earnedAt}: {earned: number[]; earnedAt: Recor
             key={badge.id}
             className={cn(
               "flex items-start gap-3 rounded-2xl border p-4 transition-colors",
-              isEarned ? "border-black/[0.06] bg-white shadow-soft" : "border-black/[0.05] bg-black/[0.02] opacity-70",
+              isEarned ? "border-line bg-card shadow-soft" : "border-line bg-ink/[0.03] opacity-70",
             )}
           >
             <BadgeMark accent={badge.accent} earned={isEarned} />

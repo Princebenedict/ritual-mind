@@ -7,10 +7,6 @@ const nextConfig = {
     appIsrStatus: false,
     buildActivity: false,
   },
-  eslint: {
-    // Type safety is enforced by the typecheck script. Lint runs separately in CI.
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;

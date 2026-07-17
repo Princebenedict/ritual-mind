@@ -108,7 +108,7 @@ export function HeroViz() {
             animate={reduce ? undefined : {opacity: [0.4, 0.68, 0.4], scale: [0.94, 1.05, 0.94]}}
             transition={{duration: 4, ease: "easeInOut", repeat: Infinity}}
           />
-          <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] shadow-soft-lg">
+          <div className="relative overflow-hidden rounded-2xl border border-line shadow-soft-lg">
             <Image
               src="/ritual-logo.png"
               alt="Ritual"

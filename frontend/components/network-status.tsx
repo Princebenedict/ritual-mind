@@ -12,7 +12,7 @@ import {withCommas} from "@/lib/utils";
  */
 function Tile({label, value, icon}: {label: string; value: ReactNode; icon: ReactNode}) {
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft">
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft">
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">{label}</span>
         <span className="text-ink-dim">{icon}</span>

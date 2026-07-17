@@ -1,29 +1,31 @@
 import type {Config} from "tailwindcss";
 
 /**
- * Ritual Mind design tokens. Light premium theme. Warm off white canvas, pure white
- * cards with soft warm shadows, thin hairline borders, near black editorial text, and a
- * single restrained muted teal accent. Semantic colors are deep and muted so they pass
- * WCAG AA as text and data on white. Token names are stable, so changing a value here
- * retints the entire product.
+ * Ritual Mind design tokens. Two themes, one set of token names. Every color reads from a
+ * CSS variable holding RGB channels, so "rgb(var(--x) / <alpha-value>)" lets Tailwind apply
+ * opacity modifiers (bg-brand/[0.08]) and lets the whole product flip between the dark
+ * (default) and light palettes just by toggling data-theme on <html>. Values live in
+ * app/globals.css. Semantic colors are tuned to pass WCAG AA on each theme's surfaces.
  */
+const withAlpha = (v: string) => `rgb(var(${v}) / <alpha-value>)`;
+
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        bg: {base: "#F5F3EF", raised: "#FFFFFF", sunken: "#EFEDE7"},
-        surface: {DEFAULT: "#FBFAF8", strong: "#FFFFFF"},
-        card: "#FFFFFF",
-        line: {DEFAULT: "rgba(0,0,0,0.06)", bright: "rgba(0,0,0,0.12)"},
-        ink: {DEFAULT: "#1A1A1A", muted: "#6B6B6B", dim: "#757575"},
-        brand: "#256E60",
-        good: "#1E7A5A",
-        bad: "#B23B2E",
-        info: "#2F6DA6",
-        agent: "#6A57A0",
-        data: "#2C7E8C",
-        gold: "#8A6D22",
+        bg: {base: withAlpha("--bg-base"), raised: withAlpha("--bg-raised"), sunken: withAlpha("--bg-sunken")},
+        surface: {DEFAULT: withAlpha("--surface"), strong: withAlpha("--surface-strong")},
+        card: withAlpha("--card"),
+        line: {DEFAULT: "var(--line)", bright: "var(--line-bright)"},
+        ink: {DEFAULT: withAlpha("--ink"), muted: withAlpha("--ink-muted"), dim: withAlpha("--ink-dim")},
+        brand: withAlpha("--brand"),
+        good: withAlpha("--good"),
+        bad: withAlpha("--bad"),
+        info: withAlpha("--info"),
+        agent: withAlpha("--agent"),
+        data: withAlpha("--data"),
+        gold: withAlpha("--gold"),
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

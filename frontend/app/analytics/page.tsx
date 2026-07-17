@@ -11,7 +11,7 @@ import {withCommas} from "@/lib/utils";
 
 function StatTile({label, value, sub}: {label: string; value: ReactNode; sub?: string}) {
   return (
-    <div className="rounded-2xl border border-black/[0.06] bg-white p-5 shadow-soft">
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft">
       <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">{label}</div>
       <div className="mt-2 font-mono text-2xl font-bold tabular text-ink">{value}</div>
       {sub !== undefined ? <div className="mt-1 text-xs text-ink-dim">{sub}</div> : null}
@@ -60,14 +60,14 @@ export default function AnalyticsPage() {
           ) : (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <StatTile label="Registered wallets" value={withCommas(totalWallets ?? 0)} />
+                <StatTile label="Wallets tracked" value={withCommas(totalWallets ?? 0)} />
                 <StatTile label="Scored wallets" value={withCommas(scored.length)} sub="composite above zero" />
                 <StatTile
                   label="Average composite"
                   value={scored.length > 0 ? withCommas(averageComposite) : "—"}
                   sub={scored.length > 0 ? "of top scored wallets" : "no scored wallets yet"}
                 />
-                <StatTile label="Registered projects" value={withCommas(totalProjects ?? 0)} />
+                <StatTile label="Projects on chain" value={withCommas(totalProjects ?? 0)} />
               </div>
 
               <Card>

@@ -1,5 +1,8 @@
-"use client";
-
+/**
+ * Ambient canvas. Server component: it renders no theme-specific values in JS, it only
+ * reads CSS variables (--amb-*) that flip with data-theme, so the backdrop swaps between the
+ * warm cream (light) and the deep teal-black (dark) with zero flash and no client work.
+ */
 export default function AmbientBackground() {
   return (
     <div
@@ -10,24 +13,22 @@ export default function AmbientBackground() {
         zIndex: -1,
         overflow: "hidden",
         background:
-          "radial-gradient(ellipse 120% 90% at 50% -10%, #FBFAF8 0%, #F5F3EF 55%, #F1EFE9 100%)",
+          "radial-gradient(ellipse 120% 90% at 50% -10%, rgb(var(--amb-1)) 0%, rgb(var(--amb-2)) 55%, rgb(var(--amb-3)) 100%)",
       }}
     >
-      {/* very faint warm grid, masked to fade toward the edges */}
+      {/* faint grid, masked to fade toward the edges */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.028) 1px, transparent 1px)",
+            "linear-gradient(var(--amb-grid) 1px, transparent 1px), linear-gradient(90deg, var(--amb-grid) 1px, transparent 1px)",
           backgroundSize: "52px 52px",
-          maskImage:
-            "radial-gradient(ellipse 85% 65% at 50% 32%, black 45%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 85% 65% at 50% 32%, black 45%, transparent 100%)",
+          maskImage: "radial-gradient(ellipse 85% 65% at 50% 32%, black 45%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 85% 65% at 50% 32%, black 45%, transparent 100%)",
         }}
       />
-      {/* one soft cool pastel glow in the upper area, barely perceptible */}
+      {/* soft accent glow in the upper area */}
       <div
         style={{
           position: "absolute",
@@ -37,12 +38,11 @@ export default function AmbientBackground() {
           width: 760,
           height: 520,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(158,217,206,0.30) 0%, transparent 70%)",
+          background: "radial-gradient(circle, var(--amb-glow) 0%, transparent 70%)",
           filter: "blur(90px)",
         }}
       />
-      {/* faint warm highlight, upper right, to keep the light warm */}
+      {/* second, cooler glow, upper right */}
       <div
         style={{
           position: "absolute",
@@ -51,8 +51,7 @@ export default function AmbientBackground() {
           width: 460,
           height: 460,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(214,196,158,0.16) 0%, transparent 70%)",
+          background: "radial-gradient(circle, var(--amb-glow-2) 0%, transparent 70%)",
           filter: "blur(80px)",
         }}
       />

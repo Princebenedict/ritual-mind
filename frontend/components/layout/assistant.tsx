@@ -29,7 +29,7 @@ function answer(query: string, status: NetworkStatus | undefined): string {
   if (q.includes("feed") || q.includes("activity") || q.includes("transaction")) {
     return "The live activity feed shows real transactions from the latest Ritual blocks, decoded into their native types such as async commitments and settlements. Each item links to the official explorer.";
   }
-  return "I report live network status from the Ritual RPC and explain what data is available. Chain data such as blocks, transactions, and address balances is live now. Reputation features read from the deployed Ritual Mind contracts and fill in as wallets register and the agent scores them.";
+  return "I report live network status from the Ritual RPC and explain what data is available. Chain data such as blocks, transactions, and address balances is live now. Reputation features read from the deployed Ritual Mind contracts and fill in as the agent scans the network and scores wallets.";
 }
 
 export function Assistant() {
@@ -40,7 +40,7 @@ export function Assistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      text: "I can report live Ritual Network status and explain what data is available. Chain data is live, and the Ritual Mind contracts are deployed, so reputation fills in as wallets register and the agent scores them.",
+      text: "I can report live Ritual Network status and explain what data is available. Chain data is live, and the Ritual Mind contracts are deployed, so reputation fills in as the agent scans the network and scores wallets.",
     },
   ]);
 
@@ -67,12 +67,12 @@ export function Assistant() {
             animate={{x: 0}}
             exit={{x: 380}}
             transition={{duration: 0.28, ease: [0.16, 1, 0.3, 1]}}
-            className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-sm flex-col border-l border-black/[0.08] bg-white shadow-soft-lg"
+            className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-sm flex-col border-l border-line bg-card shadow-soft-lg"
             role="dialog"
             aria-modal="true"
             aria-label="Assistant"
           >
-            <div className="flex items-center justify-between border-b border-black/[0.06] px-5 py-4">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <div className="flex items-center gap-2">
                 <Sparkles size={16} className="text-agent" />
                 <span className="text-sm font-bold">Assistant</span>
@@ -94,7 +94,7 @@ export function Assistant() {
                       <p className="text-sm leading-relaxed text-ink-muted">{message.text}</p>
                     </div>
                   ) : (
-                    <span className="inline-block rounded-xl bg-black/[0.04] px-3 py-2 text-sm text-ink">{message.text}</span>
+                    <span className="inline-block rounded-xl bg-ink/[0.05] px-3 py-2 text-sm text-ink">{message.text}</span>
                   )}
                 </div>
               ))}
@@ -105,13 +105,13 @@ export function Assistant() {
                 event.preventDefault();
                 submit();
               }}
-              className="flex items-center gap-2 border-t border-black/[0.06] p-3"
+              className="flex items-center gap-2 border-t border-line p-3"
             >
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder="Ask about the live network"
-                className="h-11 flex-1 rounded-xl border border-black/[0.08] bg-white px-4 text-sm outline-none transition-all placeholder:text-ink-dim focus:border-brand/40 focus:shadow-soft"
+                className="h-11 flex-1 rounded-xl border border-line bg-card px-4 text-sm outline-none transition-all placeholder:text-ink-dim focus:border-brand/40 focus:shadow-soft"
               />
               <button type="submit" aria-label="Send" className="flex h-11 w-11 items-center justify-center rounded-xl border border-agent/40 bg-agent/[0.08] text-agent transition-all hover:bg-agent/[0.16] active:scale-95">
                 <Send size={15} />

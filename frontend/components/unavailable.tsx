@@ -10,11 +10,11 @@ export function Unavailable({title, children, className}: {title: string; childr
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-3 rounded-2xl border border-black/[0.06] bg-white px-6 py-12 text-center shadow-soft",
+        "flex flex-col items-center gap-3 rounded-2xl border border-line bg-card px-6 py-12 text-center shadow-soft",
         className,
       )}
     >
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-black/[0.06] bg-black/[0.02] text-ink-dim">
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-ink/[0.03] text-ink-dim">
         <Info size={18} />
       </div>
       <h3 className="text-base font-bold text-ink">{title}</h3>
