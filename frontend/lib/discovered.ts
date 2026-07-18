@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 /**
  * Discovered wallets store.
  *
- * When a wallet is searched — and its /wallet/<address> view opens — its address is remembered
+ * When a wallet is searched, and its /wallet/<address> view opens, its address is remembered
  * here so the leaderboard can surface it going forward. No registration and no manual action is
  * needed. Scores are always read live from the WalletRegistry, so a remembered address only
  * appears in the ranking once it actually has an on-chain score; nothing is fabricated.
@@ -48,7 +48,7 @@ export function addDiscovered(address: string): void {
   const lower = address.toLowerCase();
   const current = read();
   const next = [lower, ...current.filter((entry) => entry !== lower)].slice(0, MAX);
-  // Nothing changed (already at the front) — skip the write and the event.
+  // Nothing changed (already at the front), so skip the write and the event.
   if (next.length === current.length && next.every((entry, index) => entry === current[index])) return;
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next));

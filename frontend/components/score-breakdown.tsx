@@ -76,15 +76,22 @@ export function ScoreBreakdown({profile}: {profile: WalletProfile}) {
                 <ChevronDown size={16} className={cn("text-ink-dim transition-transform", isOpen && "rotate-180")} />
                 <span className="text-sm font-bold">{section.name}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className={cn("font-mono text-sm font-bold", BAND_TEXT[bandFor(section.score, section.max)])}>
-                  {section.score}
-                </span>
-                <span className="font-mono text-xs text-ink-dim">/ {section.max}</span>
-              </div>
+              {section.score === 0 ? (
+                <span className="text-xs font-medium text-ink-dim">Not yet scored</span>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className={cn("font-mono text-sm font-bold", BAND_TEXT[bandFor(section.score, section.max)])}>
+                    {section.score}
+                  </span>
+                  <span className="font-mono text-xs text-ink-dim">/ {section.max}</span>
+                </div>
+              )}
             </button>
             {isOpen ? (
               <div className="border-t border-line bg-bg-raised px-5 py-4">
+                {section.score === 0 ? (
+                  <p className="mb-2 text-sm text-ink-muted">No activity found on chain yet for this component.</p>
+                ) : null}
                 <p className="text-sm leading-relaxed text-ink-muted">{section.measures}</p>
               </div>
             ) : null}

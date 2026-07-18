@@ -99,14 +99,7 @@ function ReputationSection({address}: {address: string}) {
         <div className="mb-3">
           <SectionLabel>Soulbound badges{hasBadges ? ` (${data.badges.length})` : ""}</SectionLabel>
         </div>
-        {hasBadges ? (
-          <BadgeGrid earned={data.badges} earnedAt={data.badgeEarnedAt} />
-        ) : (
-          <p className="text-sm text-ink-muted">
-            No badges earned yet. Badges are soulbound and minted by the ScoreOracle when this wallet crosses a
-            threshold. Each is verifiable on chain.
-          </p>
-        )}
+        <BadgeGrid earned={data.badges} earnedAt={data.badgeEarnedAt} />
       </div>
     </div>
   );

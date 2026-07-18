@@ -11,7 +11,7 @@ export const BADGES: BadgeDefinition[] = [
   {id: 1, title: "Genesis Builder", description: "Deployed a first contract on Ritual Chain.", requirement: "Deploy one contract", accent: "brand"},
   {id: 2, title: "Precompile Pioneer", description: "Used three or more distinct precompiles.", requirement: "3 precompiles", accent: "data"},
   {id: 3, title: "Ecosystem Architect", description: "Used all five tracked precompile families.", requirement: "5 precompiles", accent: "data"},
-  {id: 4, title: "Power Poster", description: "Reached the top advocate score band for quality content.", requirement: "Advocate score band", accent: "agent"},
+  {id: 4, title: "Power Poster", description: "Reached an advocate score of 250 or more.", requirement: "Advocate 250+", accent: "agent"},
   {id: 5, title: "OG Ritualist", description: "Among the first one hundred wallets registered.", requirement: "First 100 wallets", accent: "gold"},
   {id: 6, title: "Connector", description: "Gave ten or more attestations to other wallets.", requirement: "10 attestations given", accent: "info"},
   {id: 7, title: "Trusted Voice", description: "Received twenty or more attestations.", requirement: "20 attestations received", accent: "good"},
