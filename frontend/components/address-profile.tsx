@@ -8,10 +8,10 @@ import {contractEvidence} from "@/lib/contracts";
 import {MonoAddress} from "@/components/ui/mono";
 import {Card, SectionLabel, Skeleton, Tag} from "@/components/ui/primitives";
 import {Unavailable} from "@/components/unavailable";
-import {BadgeGrid} from "@/components/badges";
-import {ScoreBreakdown} from "@/components/score-breakdown";
+import {BadgeGrid, BadgeProgress} from "@/components/badges";
 import {EvidenceBar} from "@/components/evidence";
 import {CONTRACTS, explorerAddress} from "@/lib/chain";
+import {bandFor, BAND_TEXT, cn} from "@/lib/utils";
 import type {Address} from "@/lib/types";
 
 function Metric({label, value, sub}: {label: string; value: string; sub?: string}) {
@@ -76,12 +76,14 @@ function ReputationSection({address}: {address: string}) {
             {data.globalRank > 0 ? <Tag tone="brand">rank #{data.globalRank}</Tag> : null}
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <Metric label="Composite" value={String(data.composite)} sub="out of 1000" />
-          <Metric label="Builder" value={String(data.builder)} sub="out of 400" />
-          <Metric label="Advocate" value={String(data.advocate)} sub="out of 300" />
-          <Metric label="Community" value={String(data.community)} sub="out of 200" />
-          <Metric label="User" value={String(data.user)} sub="out of 100" />
+        <div className="mt-4 flex items-end gap-2.5">
+          <span
+            className={cn("font-mono text-4xl font-bold tabular leading-none", BAND_TEXT[bandFor(data.composite, 1000)])}
+          >
+            {data.composite}
+          </span>
+          <span className="mb-0.5 font-mono text-sm text-ink-dim">/ 1000</span>
+          <span className="mb-1 ml-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-dim">composite</span>
         </div>
         <div className="mt-4">
           <EvidenceBar evidence={scoreEvidence} label="Score written on chain" />
@@ -90,9 +92,9 @@ function ReputationSection({address}: {address: string}) {
 
       <div>
         <div className="mb-3">
-          <SectionLabel>Component breakdown</SectionLabel>
+          <SectionLabel>Badge progress</SectionLabel>
         </div>
-        <ScoreBreakdown profile={data} />
+        <BadgeProgress earned={data.badges} />
       </div>
 
       <div>

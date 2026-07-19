@@ -11,6 +11,84 @@ const ACCENT_RING: Record<BadgeDefinition["accent"], string> = {
   info: "border-info/40 text-info",
 };
 
+const ACCENT_DOT: Record<BadgeDefinition["accent"], string> = {
+  brand: "bg-brand",
+  good: "bg-good",
+  agent: "bg-agent",
+  data: "bg-data",
+  gold: "bg-gold",
+  info: "bg-info",
+};
+
+/**
+ * Overall badge completion for a wallet, derived only from on chain badge ownership. The
+ * percentage is earned badges over the ten total soulbound badges, so 100 percent means every
+ * badge has been minted to this wallet. Nothing here is estimated. Each pip maps to one badge
+ * and fills with the badge color once that badge is held.
+ */
+export function BadgeProgress({earned}: {earned: number[]}) {
+  const total = BADGES.length;
+  const earnedCount = BADGES.filter((badge) => earned.includes(badge.id)).length;
+  const pct = Math.round((earnedCount / total) * 100);
+  const complete = earnedCount === total;
+
+  const size = 104;
+  const stroke = 9;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const filled = (pct / 100) * circumference;
+
+  return (
+    <div className="rounded-2xl border border-line bg-card p-5 shadow-soft sm:p-6">
+      <div className="flex flex-col items-center gap-5 sm:flex-row">
+        <div className="relative shrink-0" style={{width: size, height: size}}>
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+            <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} className="stroke-ink/10" />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference - filled}
+              className={cn("transition-all duration-500", complete ? "stroke-good" : "stroke-brand")}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-mono text-2xl font-bold tabular text-ink">{pct}%</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-dim">complete</span>
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1 text-center sm:text-left">
+          <div className="font-mono text-sm font-bold tabular text-ink">
+            {earnedCount} of {total} badges earned
+          </div>
+          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+            {complete
+              ? "Every soulbound badge has been minted to this wallet."
+              : `${total - earnedCount} badges are still available. Each is minted on chain when this wallet crosses its threshold.`}
+          </p>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
+            {BADGES.map((badge) => (
+              <span
+                key={badge.id}
+                title={badge.title}
+                className={cn(
+                  "h-2.5 w-2.5 rounded-full",
+                  earned.includes(badge.id) ? ACCENT_DOT[badge.accent] : "bg-ink/10",
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BadgeMark({accent, earned}: {accent: BadgeDefinition["accent"]; earned: boolean}) {
   return (
     <div
